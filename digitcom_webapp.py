@@ -22,7 +22,7 @@ st.title("DigitCom AI Assistant")
 
 
 # Set an LLM for the agent
-llm = LLM(model="gpt-4o-mini",
+llm = LLM(model="gpt-4o",
           temperature=0)
 
 @st.cache_resource
