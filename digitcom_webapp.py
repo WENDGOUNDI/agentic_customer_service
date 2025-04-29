@@ -45,7 +45,8 @@ csv_source = load_csv_data("ventes_digitcom_2 - Sheet1.csv")
 # Create an agent with the knowledge store
 digicom_agent = Agent(
     role="Company Agent",
-    goal="ton role est de répondre à des questions sur DigitCom, une entreprise de vente de produits digitaux/ecommerce. reepond juste qux question pose, pas d'extra",
+    goal="""ton role est de répondre à des questions sur DigitCom, une entreprise de vente de produits digitaux/ecommerce. reepond juste qux question pose, pas d'extra.
+                        Si l'utilisateur utilise une autre langue que le francais, analyze la question our la phrase pour la comprendre avant de repondre.""",
     backstory="""Tu es un expert a repondre aux questions liees a DigitCom.""",
     verbose=False,
     allow_delegation=False,
