@@ -85,7 +85,3 @@ if prompt := st.chat_input("Que puis je faire pour vous?"):
             time.sleep(0.05)
     print(full_response)
     st.session_state.messages.append({"role": "assistant", "content": full_response})
-
-            time.sleep(0.05)
-    print(full_response)
-    st.session_state.messages.append({"role": "assistant", "content": full_response})
