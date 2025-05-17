@@ -7,7 +7,7 @@ import os
 import time
 
 from crewai import Agent, Task, Process, LLM, Crew
-from crewai.knowledge.source.csv_knowledge_source import CSVKnowledgeSource
+#from crewai.knowledge.source.csv_knowledge_source import CSVKnowledgeSource
 from crewai.knowledge.source.pdf_knowledge_source import PDFKnowledgeSource
 
 
@@ -17,8 +17,7 @@ from crewai.knowledge.source.pdf_knowledge_source import PDFKnowledgeSource
 # Initialize the OpenAI API client
 os.environ['OPENAI_API_KEY'] = st.secrets["bot_key"]
 
-
-st.title("DigitCom AI Assistant")
+st.title("Aube Nouvelle AI Assistant")
 
 
 # Set an LLM for the agent
@@ -28,42 +27,41 @@ llm = LLM(model="gpt-4o",
 @st.cache_resource
 def load_pdf_knowledge(filepath):
     print("Loading PDF knowledge...")
-    pdf_source = PDFKnowledgeSource(file_paths=[filepath])
+    pdf_source = PDFKnowledgeSource(file_paths=filepath)
     return pdf_source
 
-@st.cache_data
-def load_csv_data(filepath):
-    print("Loading CSV data...")
-    # Assuming your CSVKnowledgeSource returns some processed data
-    csv_source = CSVKnowledgeSource(file_paths=[filepath])
-    return csv_source # Or similar method
 
-pdf_source = load_pdf_knowledge("company_description.pdf")
-csv_source = load_csv_data("ventes_digitcom_2 - Sheet1.csv")
+
+pdf_source = load_pdf_knowledge(["Aube nouvelle.PDF",
+                                 "Offres-de-formation-Universite-Aube-Nouvelle-Ouaga_250517_114215.pdf"])
+
 
 
 # Create an agent with the knowledge store
-digicom_agent = Agent(
-    role="Company Agent",
-    goal="""ton role est de répondre à des questions sur DigitCom, une entreprise de vente de produits digitaux/ecommerce. reepond juste qux question pose, pas d'extra.
-                        Si l'utilisateur utilise une autre langue que le francais, analyze la question our la phrase pour la comprendre avant de repondre.""",
-    backstory="""Tu es un expert a repondre aux questions liees a DigitCom.""",
+university_agent = Agent(
+    role="University Agent",
+    goal="""ton role est de répondre aux questions sur l'universite Aube Nouvelle (U-Auben) en appelation francaise et New Dawn university en anglais qui autrefois
+     s'appelait ISIG qui signifie Institut Superieur d'Informatique et de Gestion. Gnatan Isidore KINI en est le fondateur. Repond juste aux question posee, pas d'extra.
+                        Si l'utilisateur utilise une autre langue que le francais, analyze la question ou la phrase pour la comprendre avant de repondre.""",
+    backstory="""Tu es un expert en consultation, accompagnant toute personne qui souhaite en savoir plus sur l'université Aube Nouvelle (U-Auben) et ses offres de formation.
+    Tu es capable de répondre à des questions sur l'université, ses programmes, ses valeurs et sa mission. Tu es également capable de fournir des informations sur les conditions d'admission et les procédures d'inscription.""",
     verbose=False,
     allow_delegation=False,
     llm=llm,
 )
 task = Task(
-    description="repond aux questions suivantes sur DigitCom: {question}",
+    description='''repond aux questions suivantes sur l'universite Aube Nouvelle (U-Auben) en appelation francaise et New Dawn university en anglais qui autrefois
+     s'appelait ISIG qui signifie Institut Superieur d'Informatique et de Gestion: {question}''',
     expected_output="une reponse a la question.",
-    agent=digicom_agent,
+    agent=university_agent,
 )
 
 crew = Crew(
-    agents=[digicom_agent],
+    agents=[university_agent],
     tasks=[task],
     verbose=False,
     process=Process.sequential,
-    knowledge_sources=[pdf_source, csv_source], )
+    knowledge_sources=[pdf_source] )
 
 
 if "messages" not in st.session_state:
@@ -73,7 +71,7 @@ for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
 
-if prompt := st.chat_input("What can I do for you?"):
+if prompt := st.chat_input("Que puis je faire pour vous?"):
     st.session_state.messages.append({"role": "user", "content": prompt})
     with st.chat_message("user"):
         st.markdown(prompt)
@@ -84,6 +82,10 @@ if prompt := st.chat_input("What can I do for you?"):
         for response in crew.kickoff(inputs={"question": prompt}).raw:   
             full_response += response
             message_placeholder.markdown(full_response)
+            time.sleep(0.05)
+    print(full_response)
+    st.session_state.messages.append({"role": "assistant", "content": full_response})
+
             time.sleep(0.05)
     print(full_response)
     st.session_state.messages.append({"role": "assistant", "content": full_response})
